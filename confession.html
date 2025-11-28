@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💌 一个特别的邀请</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+    <style>
+        /* 1. 全局与背景设置 */
+        :root {
+            --primary-pink: #ffb6c1; /* 淡粉 */
+            --light-pink: #ffe4e1;  /* 浅白/奶白 */
+            --accent-warm: #ffddaa; /* 暖黄 */
+            --clear-blue: #add8e6;  /* 清爽蓝 */
+            --text-color: #333;
+            --main-font: 'Ma Shan Zheng', 'Zhi Mang Xing', 'Arial', sans-serif;
+            --special-font: 'Zhi Mang Xing', 'Ma Shan Zheng', cursive;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, var(--light-pink) 0%, var(--primary-pink) 100%);
+            font-family: var(--main-font);
+            color: var(--text-color);
+            overflow: hidden; /* 防止粒子溢出产生滚动条 */
+            position: relative;
+            user-select: none;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* 2. 粒子/光晕效果 (Particle & Glow) */
+        .particle-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            opacity: 0;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+            animation: float-and-fade linear infinite;
+        }
+
+        @keyframes float-and-fade {
+            0% { transform: translateY(0); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-100vh); opacity: 0; }
+        }
+
+        /* 3. 主内容区域 (Content Box) */
+        #confession-container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 0 0 50px rgba(255, 182, 193, 0.4); /* 柔光阴影 */
+            z-index: 10;
+            max-width: 90%;
+            width: 400px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.5s ease-out;
+        }
+
+        /* 4. 文案区域 (Text Area) */
+        #text-display {
+            font-size: 1.2em;
+            line-height: 1.8;
+            height: auto;
+            min-height: 100px;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 1.2s ease-in-out, transform 1.2s ease-in-out;
+            color: var(--text-color);
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.6);
+            padding: 10px;
+        }
+
+        /* 特殊文案样式 (告白句) */
+        .special-text {
+            font-family: var(--special-font);
+            font-size: 1.4em !important;
+            color: var(--primary-pink);
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 5px rgba(255, 182, 193, 0.5);
+            padding: 15px 0;
+        }
+        
+        /* 5. 按钮样式 (Button) */
+        .action-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            background-color: var(--primary-pink);
+            color: white;
+            font-size: 1.1em;
+            font-family: var(--main-font);
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 5px 15px rgba(255, 182, 193, 0.4);
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .action-button:hover {
+            background-color: #ff8fa5;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 182, 193, 0.6);
+        }
+
+        .action-button:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(255, 182, 193, 0.4);
+        }
+
+        /* 呼吸动效 */
+        .breathe-animate {
+            animation: breathe 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes breathe {
+            from { transform: scale(1); box-shadow: 0 5px 15px rgba(255, 182, 193, 0.4); }
+            to { transform: scale(1.03); box-shadow: 0 8px 25px rgba(255, 182, 193, 0.6); }
+        }
+
+        /* 6. 最终选项区域 (Final Options) */
+        #final-options {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            gap: 10px;
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        /* 7. 告白动画容器 (Animation) */
+        #animation-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 20;
+            display: none; /* 默认隐藏 */
+            overflow: hidden;
+        }
+
+        /* 心形扩散动画 */
+        .heart-ripple {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background-color: rgba(255, 105, 180, 0.4); /* Hot Pink */
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: ripple 2s ease-out forwards;
+        }
+
+        @keyframes ripple {
+            0% { width: 0; height: 0; opacity: 1; }
+            100% { width: 300vh; height: 300vh; opacity: 0; }
+        }
+
+        /* 星光飘落 */
+        .star {
+            position: absolute;
+            background-color: #fff;
+            box-shadow: 0 0 10px #fff, 0 0 20px var(--accent-warm);
+            border-radius: 50%;
+            animation: star-fall 3s ease-in-out infinite;
+        }
+
+        @keyframes star-fall {
+            0% { transform: translateY(-10vh) translateX(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(100vh) translateX(5vw); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="particle-container" id="particle-container"></div>
+
+    <div id="confession-container">
+        <div id="text-display">点击下方的按钮，我想告诉你一些深埋在心底的话...</div>
+        
+        <button id="action-button" class="action-button breathe-animate">开启我的心扉</button>
+        
+        <div id="final-options">
+            <button class="action-button final-choice">愿意</button>
+            <button class="action-button final-choice">当然愿意</button>
+        </div>
+    </div>
+    
+    <div id="animation-overlay"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const texts = [
+                "小萌，听说一见钟情都是相互的，就叮的一下，脑子里有铃铛乱响，心里有嗡嗡嗡的声音，我以前真的不怕的。",
+                "你身边好像有很多人，但又好像一直空落落的，一个人。",
+                "人心真是奇怪，明明改变不了天气，却想预知天气。",
+                "就好像人明明改变不了任何人，却想知道别人为什么痛苦，为什么爱恨。",
+                "我从前从没对这些事情好奇过，直到遇到了你。",
+                "我的心脏好像被施了魔法，现在它只为你一个人保持着跳动的频率。遇见你，所有的风景都变成了背景，你才是我的目的地。" // 专属告白
+            ];
+            
+            let currentStep = 0;
+            const textDisplay = document.getElementById('text-display');
+            const actionButton = document.getElementById('action-button');
+            const finalOptions = document.getElementById('final-options');
+            const confessionContainer = document.getElementById('confession-container');
+            const animationOverlay = document.getElementById('animation-overlay');
+            const finalChoices = document.querySelectorAll('.final-choice');
+
+            // --- 粒子动画生成 ---
+            function createParticle() {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 8 + 4; // 4px to 12px
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDuration = `${Math.random() * 5 + 5}s`; // 5s to 10s
+                particle.style.animationDelay = `-${Math.random() * 5}s`; // 负延迟，立刻开始
+                document.getElementById('particle-container').appendChild(particle);
+
+                // 20秒后自动移除，防止DOM元素过多
+                setTimeout(() => particle.remove(), 20000);
+            }
+
+            // 持续生成粒子
+            for (let i = 0; i < 30; i++) {
+                createParticle();
+            }
+            setInterval(createParticle, 500); // 每0.5秒生成一个新粒子
+
+            // --- 核心交互逻辑 ---
+            function updateText() {
+                // 1. 淡出当前文本
+                textDisplay.style.opacity = '0';
+                textDisplay.style.transform = 'translateY(10px)';
+
+                setTimeout(() => {
+                    // 2. 切换到下一个文本
+                    const newText = texts[currentStep];
+                    textDisplay.innerHTML = newText;
+                    
+                    // 检查是否是告白句（最后一句）
+                    textDisplay.classList.remove('special-text');
+                    if (currentStep === texts.length - 1) {
+                        textDisplay.classList.add('special-text');
+                    }
+
+                    // 3. 淡入新文本
+                    textDisplay.style.opacity = '1';
+                    textDisplay.style.transform = 'translateY(0)';
+                    
+                    currentStep++;
+
+                    // 4. 检查是否到达最后一步
+                    if (currentStep > texts.length) {
+                        // 告白动画触发
+                        actionButton.style.display = 'none';
+                        triggerConfessionAnimation();
+                        showFinalQuestion();
+                    } else if (currentStep === texts.length) {
+                        // 最后一个文案，更改按钮文本
+                        actionButton.textContent = "给你一个回答机会";
+                    }
+                }, 1200); // 等待淡出动画完成
+            }
+
+            // --- 告白动画逻辑 ---
+            function triggerConfessionAnimation() {
+                animationOverlay.style.display = 'block';
+                
+                // 1. 心形扩散
+                const ripple = document.createElement('div');
+                ripple.classList.add('heart-ripple');
+                animationOverlay.appendChild(ripple);
+
+                // 2. 星光飘落 (生成更多，更浪漫)
+                for (let i = 0; i < 15; i++) {
+                    setTimeout(() => {
+                        const star = document.createElement('div');
+                        star.classList.add('star');
+                        const size = Math.random() * 3 + 2;
+                        star.style.width = `${size}px`;
+                        star.style.height = `${size}px`;
+                        star.style.left = `${Math.random() * 100}%`;
+                        star.style.animationDuration = `${Math.random() * 2 + 3}s`;
+                        star.style.animationDelay = `${Math.random() * 1.5}s`;
+                        animationOverlay.appendChild(star);
+                        setTimeout(() => star.remove(), 5000); // 移除星光
+                    }, i * 150);
+                }
+            }
+
+            // --- 最终问题显示 ---
+            function showFinalQuestion() {
+                setTimeout(() => {
+                    // 切换到最终问题
+                    textDisplay.classList.remove('special-text');
+                    textDisplay.innerHTML = "你愿意和我一起继续走下去吗？";
+                    textDisplay.style.opacity = '1';
+                    textDisplay.style.transform = 'translateY(0)';
+                    
+                    // 显示最终选项
+                    finalOptions.style.opacity = '1';
+                    confessionContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.95)'; // 更亮一些
+                    actionButton.classList.remove('breathe-animate'); // 停止呼吸动效
+                }, 2000); // 动画播放后显示问题
+            }
+
+            // --- 甜蜜回应逻辑 ---
+            function showSweetResponse() {
+                finalOptions.style.display = 'none';
+                actionButton.style.display = 'none';
+                
+                // 移除动画层，保证屏幕整洁
+                animationOverlay.style.display = 'none';
+                
+                // 最终甜蜜文本
+                textDisplay.innerHTML = "那我们以后一起吧 ❤️";
+                textDisplay.classList.add('special-text'); // 再次使用特殊字体
+                textDisplay.style.fontSize = '1.8em';
+                
+                confessionContainer.style.transform = 'scale(1.1)';
+                confessionContainer.style.boxShadow = '0 0 100px rgba(255, 105, 180, 0.8)';
+            }
+
+
+            // --- 事件监听 ---
+            actionButton.addEventListener('click', updateText);
+
+            finalChoices.forEach(button => {
+                button.addEventListener('click', showSweetResponse);
+            });
+            
+            // 首次加载时立刻显示第一段文本的动画
+            setTimeout(() => {
+                textDisplay.style.opacity = '1';
+                textDisplay.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
